@@ -8,10 +8,7 @@ from functools import wraps
 from telegram import *
 from telegram.ext import *
 
-from dotenv import load_dotenv
 import locale
-
-load_dotenv()
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
