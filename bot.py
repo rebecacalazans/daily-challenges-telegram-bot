@@ -27,19 +27,6 @@ def add_member(challenge_id, member_id, member_username):
     if len(member) == 0:
         members.insert(dict(challenge_id = challenge_id, member_id = member_id, member_username = member_username, qnt = 0, day = 0));
 
-#def edit_member(challenge_id, member_id, qnt = 0):
-#    members = db["members"];
-#    member = members.find(challenge_id = challenge_id, member_id = member_id);
-#    member = list(member);
-#
-#    if len(member) == 0:
-#        members.insert(dict(challenge_id = challenge_id, member_id = member_id, qnt = 0, day = 0));
-#    else:
-#        qnt += member[0]['qnt'];
-#
-#    data = dict(challenge_id = challenge_id, member_id = member_id, qnt = qnt);
-#    members.update(data, ['challenge_id', 'member_id']);
-
 def start(bot, update):
     bot.send_message(chat_id=update.message.chat_id, text="Eu sou um bot, mas você pode me entender como uma convolução cíclica multivariável");
 
@@ -52,7 +39,6 @@ def list_challenges(bot, update):
     challenges = list(challenges.all())
     custom_keyboard = [];
     text = "";
-
 
     if(len(challenges) == 0):
         bot.send_message(
@@ -68,7 +54,6 @@ def list_challenges(bot, update):
                          parse_mode = ParseMode.MARKDOWN,
                          text=text,
                          reply_markup=reply_markup)
-
     #custom_keyboard.append([InlineKeyboardButton("Criar desafio...", callback_data="append_challenge")]);
 
 def delete_challenge(id):
@@ -102,17 +87,17 @@ def get_challenge_data(cid):
 
     members = db["members"].find(challenge_id = cid);
     text = "*" + challenge["name"] + "*\n";
-    text += challenge["description"] + '\n\n';
+    text += challenge["description"] + '\n\n\n';
 
-    text += "*Participantes do desafio: *\n\n";
-
-    text += '`Participante' + 5*' ' + "Dias" + 3*' ' + "Contagem" + '\n';
+    text += '`Participante' + 6*' ' + "Dias" + 4*' ' + "Contagem" + '\n\n';
     for row in members:
         username = row["member_username"];
         day = str(row["day"]);
         cnt = str(row["qnt"]);
+        tot = str(row["tot"]);
 
-        text += username + "  " + (16-len(username))*' ' + day + (10-len(day))*' ' + cnt + '\n';
+        text += username + "  " + (16-len(username))*' ' + (3-len(day))*' '  + day + (10-len(cnt))*' ' + cnt + '\n';
+        text += "  └Total :" + (3 - len(tot))*' ' + tot + '\n\n';
     text += '`'
 
     return text;
