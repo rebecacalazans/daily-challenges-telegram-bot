@@ -89,7 +89,7 @@ def get_challenge_data(cid):
     text = "*" + challenge["name"] + "*\n";
     text += challenge["description"] + '\n\n\n';
 
-    text += '`Participante' + 6*' ' + "Dias" + 4*' ' + "Contagem" + '\n\n';
+    text += '`Participante' + 6*' ' + "Dias  Contagem" + '\n\n';
     for row in members:
         username = row["member_username"];
         day = str(row["day"]);
@@ -97,7 +97,7 @@ def get_challenge_data(cid):
         tot = str(row["tot"]);
 
         text += username + "  " + (16-len(username))*' ' + (3-len(day))*' '  + day + (10-len(cnt))*' ' + cnt + '\n';
-        text += "  └Total :" + (3 - len(tot))*' ' + tot + '\n\n';
+        text += "  └Total: " + (3 - len(tot))*' ' + tot + '\n\n';
     text += '`'
 
     return text;
@@ -192,6 +192,7 @@ def challenge_options(bot, update):
         elif data[2] == "add":
             val = int(data[3]);
             member['qnt'] += val;
+            member['tot'] += val;
         members.update(member, ['challenge_id', 'member_id']);
 
     #select_challenge(bot, update, cid);
