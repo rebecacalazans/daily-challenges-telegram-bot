@@ -89,16 +89,19 @@ def get_challenge_data(cid):
     text = "*" + challenge["name"] + "*\n";
     text += challenge["description"] + '\n\n\n';
 
-    text += '`Participante' + 6*' ' + "Dias  Contagem" + '\n\n';
+    text += '`';
     for row in members:
         username = row["member_username"];
         day = str(row["day"]);
         cnt = str(row["qnt"]);
         tot = str(row["tot"]);
 
-        text += username + "  " + (16-len(username))*' ' + (3-len(day))*' '  + day + (10-len(cnt))*' ' + cnt + '\n';
-        text += "  └Total: " + (3 - len(tot))*' ' + tot + '\n\n';
-    text += '`'
+        text += username + "\n";
+        text += "  └ Contagem: " + (10 - len(cnt))*' ' + cnt + '\n';
+        text += "  └ Dias:     "+  (10 - len(day))*' '  + day + '\n';
+        text += "  └ Total:    " + (10 - len(tot))*' ' + tot + '\n\n';
+
+    text += '`';
 
     return text;
 
