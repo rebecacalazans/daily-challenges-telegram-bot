@@ -4,7 +4,7 @@ Wants=network-online.target
 After=network.target network-online.target
 
 [Service]
-ExecStart=/srv/daily-challenges/run.sh
+ExecStart=/srv/daily-challenges-telegram-bot/run.sh
 Restart=always
 RestartSec=5
 
