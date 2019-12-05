@@ -110,15 +110,43 @@ def challenge_menu(bot, update, cid):
 
     text = get_challenge_data(cid);
 
-#   button_add = InlineKeyboardButton("Adicionar", callback_data = 'challenge ' + str(cid) + " inc");
     button1 = InlineKeyboardButton("+1", callback_data ='challenge ' + str(cid) + " add 1")
     button5 = InlineKeyboardButton("+5", callback_data ='challenge ' + str(cid) + " add 5")
     button10 = InlineKeyboardButton("+10", callback_data ='challenge ' + str(cid) + " add 10")
     button_new_day = InlineKeyboardButton("Começar novo dia", callback_data ='challenge ' + str(cid) + " new_day")
     button_participate = InlineKeyboardButton("Participar", callback_data ='challenge ' + str(cid) + " participate")
+    button_advanced = InlineKeyboardButton("Opções avançadas", callback_data ='challenge ' + str(cid) + " advanced")
     button_hide = InlineKeyboardButton("Esconder Menu", callback_data ='challenge ' + str(cid) + ' hide')
 
-    custom_keyboard = [[button1, button5, button10], [button_new_day], [button_participate], [button_hide]];
+    custom_keyboard = [[button1, button5, button10], [button_new_day], [button_participate], [button_advanced], [button_hide]];
+    reply_markup = InlineKeyboardMarkup(custom_keyboard)
+    bot.edit_message_text(chat_id=query.message.chat_id,
+                          parse_mode = ParseMode.MARKDOWN,
+                          message_id=query.message.message_id,
+                          text=text, reply_markup=reply_markup)
+
+def challenge_advanced_menu(bot, update, cid):
+    query = update.callback_query
+
+    text = get_challenge_data(cid);
+
+    button_minus1 = InlineKeyboardButton("-1", callback_data ='challenge ' + str(cid) + " add -1")
+    button_minus5 = InlineKeyboardButton("-5", callback_data ='challenge ' + str(cid) + " add -5")
+    button_minus10 = InlineKeyboardButton("-10", callback_data ='challenge ' + str(cid) + " add -10")
+
+    button_total_minus1 = InlineKeyboardButton("-1 (total)", callback_data ='challenge ' + str(cid) + " total_add -1")
+    button_total_minus5 = InlineKeyboardButton("-5 (total)", callback_data ='challenge ' + str(cid) + " total_add -5")
+    button_total_minus10 = InlineKeyboardButton("-10 (total)", callback_data ='challenge ' + str(cid) + " total_add -10")
+    button_total_minus100 = InlineKeyboardButton("-100 (total)", callback_data ='challenge ' + str(cid) + " total_add -100")
+
+    button_remove_day = InlineKeyboardButton("-1 dia", callback_data ='challenge ' + str(cid) + " remove_day")
+    button_menu = InlineKeyboardButton("Voltar", callback_data ='challenge ' + str(cid) + ' menu')
+
+    custom_keyboard = [[button_minus1, button_minus5, button_minus10],
+                       [button_total_minus1, button_total_minus5, button_total_minus10],
+                       [button_total_minus100],
+                       [button_remove_day], [button_menu]];
+
     reply_markup = InlineKeyboardMarkup(custom_keyboard)
     bot.edit_message_text(chat_id=query.message.chat_id,
                           parse_mode = ParseMode.MARKDOWN,
@@ -154,10 +182,10 @@ def challenge_options(bot, update):
     if data[2] == "hide":
         select_challenge(bot, update, cid);
         return
-#        bot.edit_message_text(chat_id=query.message.chat_id,
-#                              parse_mode = ParseMode.MARKDOWN,
-#                              message_id=query.message.message_id,
-#                              text=get_challenge_data(cid))
+
+    if data[2] == "advanced":
+        challenge_advanced_menu(bot, update, cid);
+        return
 
     members = db["members"];
     member = members.find(challenge_id = cid, member_id = query.from_user.id);
@@ -167,38 +195,39 @@ def challenge_options(bot, update):
     if len(member) == 0:
         if data[2] == "participate" :
             add_member(cid, query.from_user.id, query.from_user.username);
-#            bot.edit_message_text(chat_id=query.message.chat_id,
-#                                  parse_mode = ParseMode.MARKDOWN,
-#                              message_id=query.message.message_id,
-#                              text=get_challenge_data(cid))
         else:
-#            text = get_challenge_data(cid);
              text += "\n\n\nVocê ainda não está participando do desafio";
-#            bot.edit_message_text(chat_id=query.message.chat_id,
-#                                  parse_mode = ParseMode.MARKDOWN,
-#                                  message_id=query.message.message_id,
-#                                  text=text)
+
     elif data[2] == "participate":
         return
-#        bot.edit_message_text(chat_id=query.message.chat_id,
-#                              parse_mode = ParseMode.MARKDOWN,
-#                              message_id=query.message.message_id,
-#                              text=get_challenge_data(cid))
+
     else:
         member = member[0];
 
         if data[2] == "new_day":
             member['qnt'] = 0;
             member['day'] += 1;
+        elif data[2] == "remove_day":
+            if member['day'] == 0:
+                return;
+            member['day'] -= 1;
         elif data[2] == "inc":
             increment(bot, update, cid);
+        elif data[2] == "total_add":
+            val = int(data[3]);
+            if member['tot'] + val < member['qnt']:
+                val = -(member['tot'] - member['qnt']);
+            member['tot'] += val;
         elif data[2] == "add":
             val = int(data[3]);
+            if member['qnt'] + val < 0:
+                val = -member['qnt'];
+            if member['tot'] + val < 0:
+                val = -['tot'];
             member['qnt'] += val;
             member['tot'] += val;
         members.update(member, ['challenge_id', 'member_id']);
 
-    #select_challenge(bot, update, cid);
     text = get_challenge_data(cid) + text;
 
     bot.edit_message_text(chat_id=query.message.chat_id,
@@ -206,10 +235,6 @@ def challenge_options(bot, update):
                           message_id=query.message.message_id,
                           text=text,
                           reply_markup=query.message.reply_markup)
-    #bot.edit_message_text(chat_id=query.message.chat_id,
-    #                      parse_mode = ParseMode.MARKDOWN,
-    #                      message_id=query.message.message_id,
-    #                      text=get_challenge_data(cid))
 
 def main():
     locale.setlocale(locale.LC_TIME, 'pt_BR.utf8')
